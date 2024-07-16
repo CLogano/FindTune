@@ -1,24 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
+import Login from "./layout/login/Login";
+import Callback from "./layout/callback/Callback";
+import Discover from "./layout/discover/Discover";
 
+/**
+ * Main application component that defines the routes for the app.
+ * @returns {JSX.Element} The rendered routes of the application.
+ */
 function App() {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/callback" element={<Callback />} />
+      <Route path="/discover" element={<Discover />} />
+      <Route path="/" element={<Navigate to="/login" />} />
+    </Routes>
   );
 }
 

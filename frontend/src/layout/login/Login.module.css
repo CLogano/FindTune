@@ -1,0 +1,105 @@
+.container {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    background-color: white;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 65%;
+    height: 100%;
+    background: linear-gradient(to left, #c62368, #8e35f3);
+    position: relative;
+}
+
+.logo {
+    width: 50%;
+    margin-bottom: 2rem;
+}
+
+.footer {
+    color: white;
+    position: fixed;
+    bottom: 20px;
+    font-size: 14px;
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: center;
+    width: 35%;
+    height: 100%;
+}
+
+.right h1 {
+    position: absolute;
+    top: 10%;
+    font-size: 48px;
+}
+
+.right h2 {
+    margin-bottom: 2rem;
+}
+
+.right-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.left p {
+    color: white;
+    font-size: 36px;
+    text-align: center;
+}
+
+.spacer {
+    aspect-ratio: 350/900;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.wave-layer {
+    background-image: url("../../pictures/layered-waves.svg");
+}
+
+@media screen and (max-width: 1200px) {
+    .left p {
+        font-size: 24px;
+    }
+
+    .right h1 {
+        font-size: 36px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .right h1 {
+        font-size: 24px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+}
+
+@media screen and (max-width: 480px) {
+}
+
+@media screen and (max-width: 320px) {
+
+}
+
