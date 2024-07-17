@@ -6,6 +6,8 @@
     font-weight: 400;
     font-style: normal;
     background-color: white;
+    position: relative;
+    overflow: hidden;
 }
 
 .left {
@@ -20,8 +22,9 @@
 }
 
 .logo {
+    min-width: 200px;
     width: 50%;
-    margin-bottom: 2rem;
+    margin: 2rem;
 }
 
 .footer {
@@ -59,6 +62,10 @@
     width: 100%;
 }
 
+p {
+    margin: 1rem;
+}
+
 .left p {
     color: white;
     font-size: 36px;
@@ -71,13 +78,26 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
+    width: 25%;
+    min-width: 200px;
 }
 
 .wave-layer {
     background-image: url("../../pictures/layered-waves.svg");
 }
 
-@media screen and (max-width: 1200px) {
+.content {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #8e35f3, #c62368);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+@media screen and (max-width: 1500px) {
     .left p {
         font-size: 24px;
     }
@@ -85,18 +105,91 @@
     .right h1 {
         font-size: 36px;
     }
+
+    .right h2 {
+        font-size: 20px;
+    }
+
+    .right p {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .left p {
+        font-size: 20px;
+    }
+
+    .right h1 {
+        font-size: 30px;
+    }
+
+    .right h2 {
+        font-size: 16px;
+    }
+
+    .right p {
+        font-size: 12px;
+    }
+
+    .footer {
+        font-size: 12px;
+    }
 }
 
 @media screen and (max-width: 1024px) {
-    .right h1 {
-        font-size: 24px;
+    .container {
+        flex-direction: column;
+        background-color: #fa7268;
+    }
+
+    .spacer {
+        aspect-ratio: 900/350;
+        width: 100%;
+        height: 25%;
+        min-height: 200px;
+    }
+
+    .wave-layer {
+        background-image: url("../../pictures/layered-waves-mobile.svg");
+    }
+
+    .footer {
+        font-size: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 20px;
+        background-color: #fa7268;
+        text-align: center;
+    }
+
+    .logo {
+        width: 25%;
     }
 }
 
 @media screen and (max-width: 768px) {
+    .content h2 {
+        font-size: 20px;
+    }
+
+    .content p {
+        font-size: 14px;
+    }
 }
 
 @media screen and (max-width: 480px) {
+    .content h2 {
+        font-size: 16px;
+    }
+
+    .content p {
+        font-size: 12px;
+    }
+
+    .footer {
+        font-size: 8px;
+    }
 }
 
 @media screen and (max-width: 320px) {
