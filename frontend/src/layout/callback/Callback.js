@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 /**
@@ -10,6 +10,9 @@ const Callback = () => {
     // Use React Router's hooks to access the current location and navigation functions
     const location = useLocation();
     const navigate = useNavigate();
+
+    // Display a message to the user based on if the user is granted access
+    const [message, setMessage] = useState("Logging in...");
 
     useEffect(() => {
         // Get the hash portion of the URL (containing the access token)
@@ -27,12 +30,14 @@ const Callback = () => {
 
             // Navigate to the Discover page after storing the access token
             navigate("/discover");
+        } else {
+            setMessage("No access token found. Unable to log in.");
         }
     }, [location, navigate]);
 
     return (
         <div>
-            Logging in...
+            {message}
         </div>
     );
 };
