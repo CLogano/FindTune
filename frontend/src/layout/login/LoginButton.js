@@ -12,7 +12,7 @@ const LoginButton = () => {
     // Spotify authorization parameters
     const redirectUri = CONSTANTS.frontendURL + "/callback";
     const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-    const scopes = "user-read-private user-read-email";
+    const scopes = CONSTANTS.spotifyScopes;
 
     // Function to handle login by redirecting to Spotify's authorization page
     const handleLogin = () => {
