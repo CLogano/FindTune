@@ -4,6 +4,8 @@ import Playlist from "./Playlist";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import AddPlaylistModal from "./AddPlaylistModal";
+import EditPlaylistModal from "./EditPlaylistModal";
+import DeletePlaylistModal from "./DeletePlaylistModal";
 
 /**
  * Playlists component that displays a list of playlist names and accompanying icon.
@@ -17,10 +19,15 @@ import AddPlaylistModal from "./AddPlaylistModal";
 const Playlists = (props) => {
 
     // Destructuring props
-    const { playlists, selected, onSelected, onAddPlaylist } = props;
+    const { playlists, selected, onSelected, onAddPlaylist, onEditPlaylist, onDeletePlaylist } = props;
 
     // State to control the modal for adding playlists
     const [showAddPlaylistModal, setShowAddPlaylistModal] = useState(false);
+    // State to control the modal for editing playlists
+    const [showEditPlaylistModal, setShowEditPlaylistModal] = useState(false);
+    // State to control the modal for deleting playlists
+    const [showDeletePlaylistModal, setShowDeletePlaylistModal] = useState(false);
+    
 
     // Mapping each playlist to a Playlist component
     const playlistsAsComponent = playlists.map((playlist, index) => {
@@ -37,29 +44,70 @@ const Playlists = (props) => {
                 description={playlist.description}
                 isSelected={selected === index}
                 onSelect={() => onSelected(index)}
+                onEdit={() => showEditModalHandler()}
+                onDelete={() => showDeleteModalHandler()}
             />   
         );
     });
 
     // Handler to open the modal for adding playlists
-    const showModalHandler = () => {
+    const showAddModalHandler = () => {
         setShowAddPlaylistModal(true);
     };
 
     // Handler to close the modal for adding playlists
-    const closeModalHandler = () => {
+    const closeAddModalHandler = () => {
         setShowAddPlaylistModal(false);
+    };
+
+    // Handler to open the modal for editing playlists
+    const showEditModalHandler = () => {
+        setShowEditPlaylistModal(true);
+    };
+
+    // Handler to close the modal for editing playlists
+    const closeEditModalHandler = () => {
+        setShowEditPlaylistModal(false);
+    };
+
+    // Handler to open the modal for deleting playlists
+    const showDeleteModalHandler = () => {
+        setShowDeletePlaylistModal(true);
+    };
+
+    // Handler to close the modal for deleting playlists
+    const closeDeleteModalHandler = () => {
+        setShowDeletePlaylistModal(false);
     };
 
     return (
         <Fragment>
-            {showAddPlaylistModal && <AddPlaylistModal closeModal={closeModalHandler} onAddPlaylist={onAddPlaylist} />}
+            {showAddPlaylistModal && 
+                <AddPlaylistModal
+                    closeModal={closeAddModalHandler}
+                    onAddPlaylist={onAddPlaylist}
+                />
+            }
+            {showEditPlaylistModal && selected !== null && (
+                <EditPlaylistModal
+                    closeModal={closeEditModalHandler}
+                    playlist={playlists[selected]}
+                    onEditPlaylist={onEditPlaylist}
+                />
+            )}
+            {showDeletePlaylistModal && selected !== null && (
+                <DeletePlaylistModal
+                    closeModal={closeDeleteModalHandler}
+                    playlist={playlists[selected]}
+                    onDeletePlaylist={onDeletePlaylist}
+                />
+            )}
             <div className={classes.container}>
                 <ul className={classes.list}>
                     {playlistsAsComponent}
                 </ul>
                 <div className={classes["add-button-outer-container"]}>
-                    <IconButton className={classes["add-button-inner-container"]} onClick={showModalHandler} aria-label="add playlist">
+                    <IconButton className={classes["add-button-inner-container"]} onClick={showAddModalHandler} aria-label="add playlist">
                         <AddIcon className={classes["add-button-icon"]} style={{ fontSize: 36 }} />
                     </IconButton>
                 </div>

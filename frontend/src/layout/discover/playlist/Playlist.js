@@ -1,6 +1,8 @@
 import React from "react";
 import classes from "./Playlist.module.css";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 /**
  * Playlist component that displays a single playlist item.
@@ -15,7 +17,7 @@ import MusicNoteIcon from "@mui/icons-material/MusicNote";
 const Playlist = (props) => {
 
     // Destructuring props
-    const { name, icon, description, isSelected, onSelect } = props;
+    const { name, icon, description, isSelected, onSelect, onEdit, onDelete } = props;
 
     return (
         <li className={`${classes.container} ${isSelected ? classes.selected : ""}`} onClick={onSelect}>
@@ -28,6 +30,18 @@ const Playlist = (props) => {
                 <div className={classes.name}>{name}</div>
                 <div className={classes.description}>{description ? description : "Playlist"}</div>
             </div>
+            {isSelected && (
+                <div className={classes["inner-container-2"]}>
+                    <EditIcon
+                        className={classes["edit-icon"]}
+                        onClick={onEdit}
+                    />
+                    <DeleteIcon
+                        className={classes["delete-icon"]}
+                        onClick={onDelete}
+                    />
+                </div>
+            )}
         </li>
     );
 };
