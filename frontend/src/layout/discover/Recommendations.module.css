@@ -1,0 +1,9 @@
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background: linear-gradient(to left, #8e35f3,#c62368); */
+    background-color: #c62368;
+}

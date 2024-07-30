@@ -1,0 +1,43 @@
+.container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    background-color: transparent;
+    margin: 5px 10px;
+    border-radius: 10px;
+    max-height: 80%;
+}
+
+.tabs {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    position: relative;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+}
+  
+.tab.active {
+    color: #FA7268;
+}
+
+.tab-bar {
+    position: absolute;
+    bottom: 0;
+    height: 3px;
+    background-color: #FA7268;
+    transition: transform 0.3s;
+}
+
+.content {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+}

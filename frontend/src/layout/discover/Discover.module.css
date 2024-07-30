@@ -1,0 +1,61 @@
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    background-color: #001220;
+    color: white;
+}
+
+.left {
+    width: 20%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    width: 40px;
+    cursor: pointer;
+}
+
+.profile-icon {
+    cursor: pointer;
+    border-radius: 10px;
+    width: 40px;
+}
+
+.header {
+    height: 5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: transparent;
+    margin: 10px 10px 5px 10px;
+    border-radius: 10px;
+    padding: 0 5%;
+    box-sizing: border-box;
+}
+
+.wave-spacer {
+    aspect-ratio: 350/900;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    width: 25%;
+    min-width: 200px;
+    rotate: 180deg;
+}
+
+.wave-layer {
+    background-image: url("../../pictures/layered-waves.svg");
+}
+
+.right {
+    width: 80%;
+    height: 100%;
+}
+
+
+
