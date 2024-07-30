@@ -27,6 +27,7 @@
 .inner-container {
     display: flex;
     flex-direction: column;
+    flex: 1;
     margin-left: 0.5rem;
     color: white;
 }
@@ -43,3 +44,26 @@
     color: #FA7268;
     font-weight: bold;
 }
+
+.inner-container-2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.edit-icon, .delete-icon {
+    transition: color 0.3s;
+}
+
+.edit-icon:hover, .delete-icon:hover {
+    color: #FA7268;
+}
+
+.edit-icon {
+    margin-right: 0.25rem;
+}
+
+.delete-icon {
+    margin-left: 0.25rem;
+}
+

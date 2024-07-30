@@ -88,12 +88,9 @@ const Discover = () => {
     // TO-DO: api call to delete playlist on backend
     // Using dummy playlist for now
 
-    setPlaylists((prevPlaylists) => {
-      const updatedPlaylists = [...prevPlaylists, playlist];
-      // Select the first playlist
-      setSelectedPlaylist(0);
-      return updatedPlaylists;
-    });
+    setPlaylists((prevPlaylists) => prevPlaylists.filter((p) => p.id !== playlist.id));
+     // Reset the selected playlist
+    setSelectedPlaylist(0);
   };
 
   return (
