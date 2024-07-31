@@ -77,7 +77,11 @@ const Discover = () => {
     // Using dummy playlist for now
 
     setPlaylists((prevPlaylists) => {
-      const updatedPlaylists = [...prevPlaylists, playlist];
+      // Create a new array of playlists
+      const updatedPlaylists = prevPlaylists.map((p) =>
+        p.id === playlist.id ? playlist : p
+      );
+
       return updatedPlaylists;
     });
   };
