@@ -1,12 +1,13 @@
 import React, { useState, useEffect, Fragment } from "react";
 import classes from "./Discover.module.css";
-import { getProfile, getPlaylists } from "./helpers/getUserData";
+import { getProfile, getPlaylists, createPlaylist, editPlaylist, deletePlaylist } from "./helpers/userDataHelper";
 import useScreenSize from "../../hooks/useScreenSize";
 import logo from "../../pictures/logo-white-cropped.png";
 import Sidebar from "./Sidebar";
 import Recommendations from "./Recommendations";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LineSpacer from "../../UI/LineSpacer";
+import LoadingRing from "../../UI/LoadingRing";
 
 /**
  * Discover component that recommends new music to users based on spotify data and filters.
@@ -14,42 +15,113 @@ import LineSpacer from "../../UI/LineSpacer";
  */
 const Discover = () => {
 
-  // Obtain Spotify access token
-  const accessToken = localStorage.getItem("spotify_access_token");
-
+  // State to keep track of the user's spotify access token
+  const [accessToken, setAccessToken] = useState("");
   // State to keep track of the user's data
   const [userData, setUserData] = useState(null);
   // State to keep track of user's playlists
   const [playlists, setPlaylists] = useState([]);
-  // State to manage the selected playlist
+  // State to keep track of the selected playlist
   const [selectedPlaylist, setSelectedPlaylist] = useState(0);
+  // State to keep track of the loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   // Check if the screen size is small and adjust styling accordingly
   const isSmallScreen = useScreenSize();
 
-  // Fetch user data and playlists when the component mounts or accessToken changes
+  // // Set the access token when the component mounts
+  // useEffect(() => {
+
+  //   const token = localStorage.getItem("spotify_access_token");
+  //   setAccessToken(token);
+
+  // }, []);
+
+  // // Fetch user data when the accessToken changes
+  // useEffect(() => {
+
+  //   const fetchUserProfile = async () => {
+
+  //     if (!accessToken) return;
+
+  //     // Fetch user profile data using access token
+  //     const profileData = await getProfile(accessToken);
+  //     console.log(profileData);
+  //     setUserData(profileData);
+  //   };
+
+  //   fetchUserProfile();
+
+  // }, [accessToken]);
+
+
+  // useEffect(() => {
+
+  //   const fetchUserPlaylists = async () => {
+
+  //     if (!userData) return;
+
+  //     // Obtain the user's spotify id
+  //     const userId = userData.id;
+
+  //     // Fetch user's playlists using access token
+  //     const playlistsData = await getPlaylists(accessToken, userId);
+
+  //     // Filter playlists to include only those owned by the user or are collaborative
+  //     const editablePlaylists = playlistsData.filter(playlist =>
+  //       playlist.owner.id === userId || playlist.collaborative
+  //     );
+
+  //     console.log(editablePlaylists);
+  //     setPlaylists(editablePlaylists)
+
+  //     setIsLoading(false);
+  //   }
+
+  //   fetchUserPlaylists();
+
+    
+  // }, [userData]);
+
+  // Fetch user data and playlists when the component mounts
   useEffect(() => {
 
     const fetchData = async () => {
-      // Fetch user profile data using access token
-      const profileData = await getProfile(accessToken);
-      console.log(profileData);
-      setUserData(profileData);
+      const token = localStorage.getItem("spotify_access_token");
+      if (!token) return;
 
-      // Fetch user's playlists using access token
-      const playlistsData = await getPlaylists(accessToken);
+      setAccessToken(token);
 
-      // Filter playlists to include only those owned by the user or are collaborative
-      const editablePlaylists = playlistsData.filter(playlist =>
-        playlist.owner.id === profileData.id || playlist.collaborative
-      );
-      console.log(editablePlaylists);
-      setPlaylists(editablePlaylists);
+      console.log("Fetching data...");
+
+      try {
+        // Fetch user profile data using access token
+        const profileData = await getProfile(token);
+        setUserData(profileData);
+
+        console.log(profileData)
+
+        // Fetch user's playlists using access token and user ID
+        const userId = profileData.id;
+        const playlistsData = await getPlaylists(token, userId);
+
+        // Filter playlists to include only those owned by the user or are collaborative
+        const editablePlaylists = playlistsData.filter(
+          (playlist) => playlist.owner.id === userId || playlist.collaborative
+        );
+
+        console.log(editablePlaylists)
+
+        setPlaylists(editablePlaylists);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchData();
-
-  }, [accessToken]);
+  }, []);
 
   // Handler to select a playlist
   const onSelectedPlaylistHandler = (playlist) => {
@@ -57,68 +129,101 @@ const Discover = () => {
   };
 
   // Handler to add a new playlist
-  const addPlaylistHandler = (playlist) => {
+  const addPlaylistHandler = async (playlist) => {
 
-    // TO-DO: api call to create new playlist on backend
-    // Using dummy playlist for now
+    console.log("Creating new playlist...");
 
-    setPlaylists((prevPlaylists) => {
-      const updatedPlaylists = [...prevPlaylists, playlist];
-      // Select the newly added playlist
-      setSelectedPlaylist(updatedPlaylists.length - 1);
-      return updatedPlaylists;
-    });
+    // Delegate creating a new playlist to backend
+    const newPlaylist = await createPlaylist(accessToken, userData.id, playlist.name, playlist.description, playlist.image);
+
+    if (newPlaylist) {
+      setPlaylists((prevPlaylists) => {
+        const updatedPlaylists = [
+          ...prevPlaylists,
+          {
+            ...newPlaylist,
+            images: playlist.image
+              ? [{ url: typeof playlist.image === "string" ? playlist.image : URL.createObjectURL(playlist.image) }]
+              : []
+          }
+        ];
+        // Select the newly added playlist
+        setSelectedPlaylist(updatedPlaylists.length - 1);
+        return updatedPlaylists;
+      });
+    }
   };
 
   // Handler to edit a playlist
-  const editPlaylistHandler = (playlist) => {
+  const editPlaylistHandler = async (playlist) => {
 
-    // TO-DO: api call to edit playlist on backend
-    // Using dummy playlist for now
+    console.log("Editing playlist...");
 
-    setPlaylists((prevPlaylists) => {
-      // Create a new array of playlists
-      const updatedPlaylists = prevPlaylists.map((p) =>
-        p.id === playlist.id ? playlist : p
-      );
+    // Delegate editing the playlist to backend
+    const imageFile = playlist.image instanceof File ? playlist.image : null;
+    const editedPlaylist = await editPlaylist(accessToken, playlist.id, playlist.name, playlist.description, imageFile);
 
-      return updatedPlaylists;
-    });
+    if (editedPlaylist) {
+      setPlaylists((prevPlaylists) => {
+        // Create a new array of playlists
+        const updatedPlaylists = prevPlaylists.map((p) =>
+          p.id === playlist.id
+            ? {
+              ...p,
+              name: playlist.name,
+              description: playlist.description,
+              images: playlist.image
+                ? [{ url: typeof playlist.image === "string" ? playlist.image : URL.createObjectURL(playlist.image) }]
+                : []
+            }
+            : p
+        );
+        return updatedPlaylists;
+      });
+    }
   };
 
   // Handler to delete a playlist
-  const deletePlaylistHandler = (playlist) => {
+  const deletePlaylistHandler = async (playlist) => {
 
-    // TO-DO: api call to delete playlist on backend
-    // Using dummy playlist for now
+    console.log("Deleting playlist...");
 
-    setPlaylists((prevPlaylists) => prevPlaylists.filter((p) => p.id !== playlist.id));
-     // Reset the selected playlist
-    setSelectedPlaylist(0);
+    const response = await deletePlaylist(accessToken, userData.id, playlist.id);
+
+    if (response.success) {
+      setPlaylists((prevPlaylists) =>
+        prevPlaylists.filter((p) => p.id !== playlist.id)
+      );
+      // Reset the selected playlist to the first element
+      setSelectedPlaylist(0);
+    } else {
+      console.error("Error deleting playlist:", response.error);
+    }
   };
 
   return (
     <div className={classes.container}>
-      {isSmallScreen ?
-        <SmallScreenLayout
-          userData={userData}
-          playlists={playlists}
-          selectedPlaylist={selectedPlaylist}
-          onSelectedPlaylist={onSelectedPlaylistHandler}
-          onAddPlaylist={addPlaylistHandler}
-          onEditPlaylist={editPlaylistHandler}
-          onDeletePlaylist={deletePlaylistHandler}
-        /> :
-        <LargeScreenLayout
-          userData={userData}
-          playlists={playlists}
-          selectedPlaylist={selectedPlaylist}
-          onSelectedPlaylist={onSelectedPlaylistHandler}
-          onAddPlaylist={addPlaylistHandler}
-          onEditPlaylist={editPlaylistHandler}
-          onDeletePlaylist={deletePlaylistHandler}
-        />}
-    </div>
+      {isLoading ? <LoadingRing /> :
+        isSmallScreen ?
+          <SmallScreenLayout
+            userData={userData}
+            playlists={playlists}
+            selectedPlaylist={selectedPlaylist}
+            onSelectedPlaylist={onSelectedPlaylistHandler}
+            onAddPlaylist={addPlaylistHandler}
+            onEditPlaylist={editPlaylistHandler}
+            onDeletePlaylist={deletePlaylistHandler}
+          /> :
+          <LargeScreenLayout
+            userData={userData}
+            playlists={playlists}
+            selectedPlaylist={selectedPlaylist}
+            onSelectedPlaylist={onSelectedPlaylistHandler}
+            onAddPlaylist={addPlaylistHandler}
+            onEditPlaylist={editPlaylistHandler}
+            onDeletePlaylist={deletePlaylistHandler}
+          />}
+      </div>
   );
 };
 

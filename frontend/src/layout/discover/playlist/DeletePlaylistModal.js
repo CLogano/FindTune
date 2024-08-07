@@ -19,7 +19,9 @@ const DeletePlaylistModal = (props) => {
 
     // Handler to submit the form
     const onSubmitHandler = () => {
+        // Propagate the playlist upwards
         onDeletePlaylist(playlist);
+        // Close the modal afterwards
         closeModal();
     };
 
