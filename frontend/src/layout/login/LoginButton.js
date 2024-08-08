@@ -1,7 +1,7 @@
 import React from "react";
 import classes from "./LoginButton.module.css";
 import icon from "../../pictures/spotify-icon-white.png";
-import CONSTANTS from "../../constants";
+import { getLogin } from "./helpers/loginHelper";
 
 /**
  * Button component to initiate Spotify login.
@@ -9,19 +9,16 @@ import CONSTANTS from "../../constants";
  */
 const LoginButton = () => {
 
-    // Spotify authorization parameters
-    const redirectUri = CONSTANTS.frontendURL + "/callback";
-    const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-    const scopes = "user-read-private user-read-email";
+    // const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
+    // const scopes = CONSTANTS.spotifyScopes;
 
-    // Function to handle login by redirecting to Spotify's authorization page
-    const handleLogin = () => {
-        const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
-        window.location.href = authUrl;
+    // Handle login by redirecting to Spotify's authorization page
+    const loginHandler = async () => {
+        await getLogin();
     };
 
     return (
-        <button className={classes.container} onClick={handleLogin}>
+        <button className={classes.container} onClick={loginHandler}>
             <img className={classes.icon} src={icon} alt="Spotify icon" />
             <div className={classes.text}>Login with Spotify</div>
         </button>

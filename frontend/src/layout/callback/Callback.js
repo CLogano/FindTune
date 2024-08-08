@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Callback component that handles the redirection after Spotify authentication.
@@ -7,37 +7,25 @@ import { useLocation, useNavigate } from "react-router-dom";
  */
 const Callback = () => {
 
-    // Use React Router's hooks to access the current location and navigation functions
-    const location = useLocation();
+    // Use React Router's hooks to access the navigation function
     const navigate = useNavigate();
 
-    // Display a message to the user based on if the user is granted access
-    const [message, setMessage] = useState("Logging in...");
-
     useEffect(() => {
-        // Get the hash portion of the URL (containing the access token)
-        const hash = location.hash;
 
-        // Replace the leading '#' with an empty string and create URLSearchParams object
-        const params = new URLSearchParams(hash.replace('#', ''));
-
-        // Extract the access token from the URL parameters
-        const accessToken = params.get("access_token");
+        const params = new URLSearchParams(window.location.search);
+        const accessToken = params.get("accessToken");
 
         if (accessToken) {
-            // Store the access token in local storage for future API requests
             localStorage.setItem("spotify_access_token", accessToken);
-
-            // Navigate to the Discover page after storing the access token
             navigate("/discover");
         } else {
-            setMessage("No access token found. Unable to log in.");
+            navigate("/login");
         }
-    }, [location, navigate]);
+    }, [navigate]);
 
     return (
         <div>
-            {message}
+            Logging in...
         </div>
     );
 };
