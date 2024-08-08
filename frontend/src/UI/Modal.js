@@ -18,7 +18,7 @@ const Modal = (props) => {
     return ReactDOM.createPortal(
         (
             // Backdrop for the modal, clicking it will close the modal
-            <div className={classes.backdrop} onClick={onClose}>
+            <div className={classes.backdrop}>
                 <section className={classes.modal} onClick={(event) => event.stopPropagation()}>
                     {children}
                     <CloseIcon className={classes["close-icon"]} onClick={onClose} />

@@ -1,6 +1,6 @@
 .edit-outer-container {
     min-height: 200px;
-    height: 25vh;
+    max-height: 400px;
     display: flex;
     flex-direction: column;
 }
@@ -46,6 +46,12 @@
     border-radius: 10px;
 }
 
+.image-error-text {
+    color: orangered;
+    text-align: start;
+    margin: 0.5rem 0;
+}
+
 .submit-button {
     width: 75px;
     height: 35px;
@@ -63,6 +69,7 @@
     color: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     transition: opacity 0.3s;
+    position: relative;
 }
 
 .submit-button:hover {

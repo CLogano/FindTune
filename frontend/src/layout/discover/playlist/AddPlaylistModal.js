@@ -24,6 +24,8 @@ const AddPlaylistModal = (props) => {
     const [icon, setIcon] = useState(null);
     // State to keep track of the form's validity
     const [isFormValid, setIsFormValid] = useState(false);
+    // State to keep track of the error message for the icon file
+    const [iconError, setIconError] = useState("");
 
     // Handler to submit the form
     const onSubmitHandler = (event) => {
@@ -36,7 +38,7 @@ const AddPlaylistModal = (props) => {
             id: Date.now().toString(),
             name: title,
             description,
-            images: icon ? [{ url: URL.createObjectURL(icon) }] : []
+            image: icon
         };
 
         // Propagate the playlist upwards
@@ -57,8 +59,18 @@ const AddPlaylistModal = (props) => {
     };
 
     // Handler to manage the icon of the playlist
+    // Icons can have a max size of 256 KB
     const onIconChangeHandler = (event) => {
-        setIcon(event.target.files[0]);
+        const file = event.target.files[0];
+        if (file) {
+            const fileSizeInKB = file.size / 1024;
+            if (fileSizeInKB > 256) {
+                setIconError("Image size exceeds 256 KB");
+            } else {
+                setIconError("");
+                setIcon(file);
+            }
+        }
     };
 
     // Update form validity whenever the title changes
@@ -94,6 +106,7 @@ const AddPlaylistModal = (props) => {
                             style={{ display: "none" }}
                             onChange={onIconChangeHandler}
                         />
+                        {iconError && <p className={classes["image-error-text"]}>{iconError}</p>}
                     </div>
                 </div>
                 <button
