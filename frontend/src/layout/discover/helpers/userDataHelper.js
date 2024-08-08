@@ -1,7 +1,7 @@
 import CONSTANTS from "../../../constants";
 
 // Helper method used to fetch the user's profile data from Spotify
-export const getProfile = async (accessToken) => {
+export const getProfile = async (accessToken, onUnauthorized) => {
 
   // Provide the access token in the header
   const headers = {
@@ -11,6 +11,11 @@ export const getProfile = async (accessToken) => {
   try {
     // Fetch user's profile data on backend
     const response = await fetch(CONSTANTS.apiURL + "/user/profile", { headers });
+
+    if (response.status === 401) {
+      throw new Error("Unauthorized");
+    }
+
     if (!response.ok) {
       throw new Error("Error fetching user data");
     }
@@ -18,14 +23,16 @@ export const getProfile = async (accessToken) => {
     return data;
 
   } catch (error) {
+
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
     }
+    onUnauthorized();
   }
 };
 
 // Helper method used to fetch the user's playlists from Spotify
-export const getPlaylists = async (accessToken, userId) => {
+export const getPlaylists = async (accessToken, userId, onUnauthorized) => {
 
   // Provide the access token in the header
   const headers = {
@@ -37,6 +44,11 @@ export const getPlaylists = async (accessToken, userId) => {
   try {
     // Fetch user's playlists on backend
     const response = await fetch(`${CONSTANTS.apiURL}/playlists?${params}`, { headers });
+
+    if (response.status === 401) {
+      throw new Error("Unauthorized");
+    }
+
     if (!response.ok) {
       throw new Error("Error fetching user playlists");
     }
@@ -45,14 +57,16 @@ export const getPlaylists = async (accessToken, userId) => {
     return data;
 
   } catch (error) {
+
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
     }
+    onUnauthorized();
   }
 };
 
 // Helper method used to create a new playlist and add it to Spotify library
-export const createPlaylist = async (accessToken, userId, name, description = "", imageFile = "") => {
+export const createPlaylist = async (accessToken, userId, name, description = "", imageFile = "", onUnauthorized) => {
 
   // Provide the access token in the header
   const headers = {
@@ -74,6 +88,10 @@ export const createPlaylist = async (accessToken, userId, name, description = ""
       body
     });
 
+    if (response.status === 401) {
+      throw new Error("Unauthorized");
+    }
+
     if (!response.ok) {
       throw new Error("Error creating playlist");
     }
@@ -82,14 +100,16 @@ export const createPlaylist = async (accessToken, userId, name, description = ""
     return data;
 
   } catch (error) {
+
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
     }
+    onUnauthorized();
   }
 }
 
 // Helper method used to edit an existing playlist and reflect it in Spotify library
-export const editPlaylist = async (accessToken, playlistId, name, description = "", imageFile = "") => {
+export const editPlaylist = async (accessToken, playlistId, name, description = "", imageFile = "", onUnauthorized) => {
 
   // Provide the access token in the header
   const headers = {
@@ -111,6 +131,10 @@ export const editPlaylist = async (accessToken, playlistId, name, description = 
       body
     });
 
+    if (response.status === 401) {
+      throw new Error("Unauthorized");
+    }
+
     if (!response.ok) {
       throw new Error("Error editing playlist");
     }
@@ -120,14 +144,16 @@ export const editPlaylist = async (accessToken, playlistId, name, description = 
     return data;
 
   } catch (error) {
+
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
     }
+    onUnauthorized();
   }
 }
 
 // Helper method used to delete an existing playlist and reflect it in Spotify library
-export const deletePlaylist = async (accessToken, userId, playlistId) => {
+export const deletePlaylist = async (accessToken, userId, playlistId, onUnauthorized) => {
 
   // Provide the access token in the header
   const headers = {
@@ -145,15 +171,23 @@ export const deletePlaylist = async (accessToken, userId, playlistId) => {
       body
     });
 
+    if (response.status === 401) {
+      throw new Error("Unauthorized");
+    }
+
     if (!response.ok) {
       throw new Error("Error deleting playlist");
     }
 
     return { success: true };
+    
   } catch (error) {
+
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
     }
+    onUnauthorized();
+
     return { success: false, error: error.message };
   }
 };
