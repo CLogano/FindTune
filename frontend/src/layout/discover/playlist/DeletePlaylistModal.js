@@ -28,7 +28,7 @@ const DeletePlaylistModal = (props) => {
     return (
         <Modal onClose={closeModal}>
             <div className={classes["delete-container"]}>
-                <h3>Are you sure you want to delete <span className={classes.title}>{playlist.name}</span>?</h3>
+                <h3>Are you sure you want to delete <span>{playlist.name}</span>?</h3>
                 <p>Note: This action cannot be undone.</p>
                 <button className={classes["submit-button"]} onClick={onSubmitHandler}>Delete</button>
             </div>

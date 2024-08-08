@@ -24,7 +24,7 @@ const Playlist = (props) => {
             {icon ? (
                 <img className={classes.icon} src={icon} alt="Playlist icon" />
             ) : (
-                <MusicNoteIcon className={classes.icon} style={{ fontSize: 50 }} />
+                <MusicNoteIcon className={classes["default-icon"]} style={{ fontSize: 50 }} />
             )}
             <div className={classes["inner-container"]}>
                 <div className={classes.name}>{name}</div>

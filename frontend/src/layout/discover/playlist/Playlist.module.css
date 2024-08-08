@@ -1,5 +1,5 @@
 .container {
-    width: 95%;
+    width: 100%;
     height: 75px;
     display: flex;
     justify-content: flex-start;
@@ -19,7 +19,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-.icon {
+.icon, .default-icon {
     width: 50px;
     height: 50px;
     margin-right: 0.5rem;
@@ -36,10 +36,12 @@
 
 .name {
     font-size: 16px;
+    transition: color 0.3s;
 }
 
 .description {
     font-size: 12px;
+    transition: color 0.3s;
 }
 
 .selected .name {
@@ -67,4 +69,39 @@
 
 .delete-icon {
     margin-left: 0.25rem;
+}
+
+@media screen and (max-width: 1500px) {
+    .name {
+        font-size: 14px;
+    }
+
+    .description {
+        font-size: 10px;
+    }
+
+    .icon, .default-icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .selected {
+        background-color: white;
+    }
+
+    .selected .description, .selected .default-icon, .edit-icon, .delete-icon {
+        color: rgb(66, 62, 62);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .name {
+        font-size: 12px;
+    }
+
+    .description {
+        font-size: 9px;
+    }
 }

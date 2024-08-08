@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
  */
 const Callback = () => {
 
-    // Use React Router's hooks to access the current location and navigation functions
+    // Use React Router's hooks to access the navigation function
     const navigate = useNavigate();
 
     useEffect(() => {
