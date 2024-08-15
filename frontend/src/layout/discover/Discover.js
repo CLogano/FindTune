@@ -27,8 +27,16 @@ const Discover = () => {
   const [playlists, setPlaylists] = useState([]);
   // State to keep track of the selected playlist
   const [selectedPlaylist, setSelectedPlaylist] = useState(0);
-  // State to keep track of the loading state
+  // State to keep track of the loading state of user data (profile, playlists, etc)
   const [isLoading, setIsLoading] = useState(true);
+  // State to keep track of the user's selected genre for recommendations
+  const [genre, setGenre] = useState([]);
+  // State to keep track of the user's selected artists for recommendations
+  const [artists, setArtists] = useState([]);
+  // State to keep track of the user's selected markets for recommendations
+  const [markets, setMarkets] = useState([]);
+  // State to keep track of the user's selected tracks for recommendations
+  const [tracks, setTracks] = useState([]);
 
   // Use React Router's hooks to access the navigation function
   const navigate = useNavigate();
@@ -64,7 +72,7 @@ const Discover = () => {
         // Set the user data
         setUserData(profileData);
 
-        console.log(profileData)
+        console.log("User data: ", profileData);
 
         // Fetch user's playlists using access token and user id
         const userId = profileData.id;
@@ -76,12 +84,12 @@ const Discover = () => {
             (playlist) => playlist.owner.id === userId || playlist.collaborative
           );
 
-          console.log(editablePlaylists)
+          console.log("User playlists: ", editablePlaylists);
 
           // Set the user's playlists
           setPlaylists(editablePlaylists);
 
-          // Since the data is loaded, we set the loading state to false
+          // Since the user data is loaded, we set the loading state to false
           setIsLoading(false);
         }
       }
@@ -92,8 +100,9 @@ const Discover = () => {
   }, []);
 
   // Handler to select a playlist
-  const onSelectedPlaylistHandler = (playlist) => {
-    setSelectedPlaylist(playlist);
+  const onSelectedPlaylistHandler = (playlistId) => {
+    console.log("Selected playlist: ", playlists[playlistId]);
+    setSelectedPlaylist(playlistId);
   };
 
   // Handler to add a new playlist
@@ -169,6 +178,26 @@ const Discover = () => {
     }
   };
 
+  const onSelectedGenreHandler = (selectedGenre) => {
+    console.log("Selected genre: ", selectedGenre);
+    setGenre(selectedGenre);
+  };
+
+  const onSelectedArtistsHandler = (selectedArtists) => {
+    console.log("Selected artists: ", selectedArtists);
+    setArtists(selectedArtists);
+  };
+
+  const onSelectedMarketsHandler = (selectedMarkets) => {
+    console.log("Selected markets: ", selectedMarkets);
+    setMarkets(selectedMarkets);
+  };
+
+  const onSelectedTracksHandler = (selectedTracks) => {
+    console.log("Selected tracks: ", selectedTracks);
+    setTracks(selectedTracks);
+  };
+
   return (
     <div className={classes.container}>
       {isLoading ? <LoadingRing /> :
@@ -181,6 +210,16 @@ const Discover = () => {
             onAddPlaylist={addPlaylistHandler}
             onEditPlaylist={editPlaylistHandler}
             onDeletePlaylist={deletePlaylistHandler}
+            genre={genre}
+            onSelectedGenre={onSelectedGenreHandler}
+            artists={artists}
+            onSelectedArtists={onSelectedArtistsHandler}
+            markets={markets}
+            onSelectedMarkets={onSelectedMarketsHandler}
+            tracks={tracks}
+            onSelectedTracks={onSelectedTracksHandler}
+            accessToken={accessToken}
+            handleUnauthorized={handleUnauthorized}
           /> :
           <LargeScreenLayout
             userData={userData}
@@ -190,6 +229,16 @@ const Discover = () => {
             onAddPlaylist={addPlaylistHandler}
             onEditPlaylist={editPlaylistHandler}
             onDeletePlaylist={deletePlaylistHandler}
+            genre={genre}
+            onSelectedGenre={onSelectedGenreHandler}
+            artists={artists}
+            onSelectedArtists={onSelectedArtistsHandler}
+            markets={markets}
+            onSelectedMarkets={onSelectedMarketsHandler}
+            tracks={tracks}
+            onSelectedTracks={onSelectedTracksHandler}
+            accessToken={accessToken}
+            handleUnauthorized={handleUnauthorized}
           />}
       </div>
   );
@@ -203,7 +252,7 @@ const Discover = () => {
 const SmallScreenLayout = (props) => {
 
   // Destructuring props
-  const { userData, playlists, selectedPlaylist, onSelectedPlaylist, onAddPlaylist, onEditPlaylist, onDeletePlaylist } = props;
+  const { accessToken, handleUnauthorized, userData, playlists, selectedPlaylist, onSelectedPlaylist, onAddPlaylist, onEditPlaylist, onDeletePlaylist, genre, onSelectedGenre, artists, onSelectedArtists, markets, onSelectedMarkets, tracks, onSelectedTracks } = props;
 
   const [selectedMenu, setSelectedMenu] = useState("Recommendations");
 
@@ -216,9 +265,15 @@ const SmallScreenLayout = (props) => {
 
     switch (selectedMenu) {
       case "Recommendations":
-        return <Recommendations />;
+        return <Recommendations
+          genre={genre}
+          artists={artists}
+          markets={markets}
+          tracks={tracks}
+        />;
       case "Playlists":
-        return <Playlists playlists={playlists}
+        return <Playlists
+          playlists={playlists}
           selected={selectedPlaylist}
           onSelected={onSelectedPlaylist}
           onAddPlaylist={onAddPlaylist}
@@ -226,9 +281,25 @@ const SmallScreenLayout = (props) => {
           onDeletePlaylist={onDeletePlaylist}
         />;
       case "Filters":
-        return <Filters />;
+        return <Filters
+          accessToken={accessToken}
+          handleUnauthorized={handleUnauthorized}
+          genre={genre}
+          onSelectedGenre={onSelectedGenre}
+          artists={artists}
+          onSelectedArtists={onSelectedArtists}
+          markets={markets}
+          onSelectedMarkets={onSelectedMarkets}
+          tracks={tracks}
+          onSelectedTracks={onSelectedTracks}
+        />;
       default:
-        return <Recommendations />;
+        return <Recommendations
+          genre={genre}
+          artists={artists}
+          markets={markets}
+          tracks={tracks}
+        />;
     }
   };
 
@@ -266,7 +337,7 @@ const SmallScreenLayout = (props) => {
 const LargeScreenLayout = (props) => {
 
   // Destructuring props
-  const { userData, playlists, selectedPlaylist, onSelectedPlaylist, onAddPlaylist, onEditPlaylist, onDeletePlaylist } = props;
+  const { accessToken, handleUnauthorized, userData, playlists, selectedPlaylist, onSelectedPlaylist, onAddPlaylist, onEditPlaylist, onDeletePlaylist, genre, onSelectedGenre, artists, onSelectedArtists, markets, onSelectedMarkets, tracks, onSelectedTracks } = props;
 
   // Get the user's profile picture URL if available
   const profileImage = userData && userData.images && userData.images.length > 0
@@ -286,17 +357,32 @@ const LargeScreenLayout = (props) => {
         </header>
         <LineSpacer />
         <Sidebar
+          accessToken={accessToken}
+          handleUnauthorized={handleUnauthorized}
           selectedPlaylist={selectedPlaylist}
           onSelectedPlaylist={onSelectedPlaylist}
           playlists={playlists}
           onAddPlaylist={onAddPlaylist}
           onEditPlaylist={onEditPlaylist}
           onDeletePlaylist={onDeletePlaylist}
+          genre={genre}
+          onSelectedGenre={onSelectedGenre}
+          artists={artists}
+          onSelectedArtists={onSelectedArtists}
+          markets={markets}
+          onSelectedMarkets={onSelectedMarkets}
+          tracks={tracks}
+          onSelectedTracks={onSelectedTracks}
         />
       </div>
       <div className={`${classes["wave-spacer"]} ${classes['wave-layer']}`} />
       <div className={classes.right}>
-        <Recommendations />
+        <Recommendations 
+          genre={genre}
+          artists={artists}
+          markets={markets}
+          tracks={tracks}
+        />
       </div>
     </Fragment>
   );

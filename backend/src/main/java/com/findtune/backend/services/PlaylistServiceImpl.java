@@ -1,23 +1,15 @@
 package com.findtune.backend.services;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
-import org.apache.hc.core5.http.ParseException;
 import org.springframework.stereotype.Service;
 
-import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
-import se.michaelthelin.spotify.requests.data.follow.legacy.UnfollowPlaylistRequest;
-import se.michaelthelin.spotify.requests.data.playlists.ChangePlaylistsDetailsRequest;
-import se.michaelthelin.spotify.requests.data.playlists.CreatePlaylistRequest;
-import se.michaelthelin.spotify.requests.data.playlists.GetListOfUsersPlaylistsRequest;
-import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistRequest;
-import se.michaelthelin.spotify.requests.data.playlists.UploadCustomPlaylistCoverImageRequest;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * PlaylistServiceImpl class that implements the PlaylistService interface.
@@ -25,161 +17,119 @@ import se.michaelthelin.spotify.requests.data.playlists.UploadCustomPlaylistCove
  */
 @Service
 public class PlaylistServiceImpl implements PlaylistService {
-    
-    private final SpotifyApi spotifyApi;
 
-    /**
-     * Constructs a PlaylistServiceImpl with the given SpotifyApi.
-     *
-     * @param spotifyApi the SpotifyApi instance.
-     */
-    public PlaylistServiceImpl(SpotifyApi spotifyApi) {
-        this.spotifyApi = spotifyApi;
+    private final HttpClient httpClient;
+    private final ObjectMapper objectMapper;
+
+    public PlaylistServiceImpl(HttpClient httpClient, ObjectMapper objectMapper) {
+        this.httpClient = httpClient;
+        this.objectMapper = objectMapper;
     }
 
-    /**
-     * Retrieves the list of user's playlists.
-     *
-     * @param accessToken the access token for Spotify API.
-     * @param userId the user's Spotify ID.
-     * @return the list of playlists.
-     * @throws IOException if an I/O error occurs.
-     * @throws SpotifyWebApiException if the Spotify API returns an error.
-     * @throws ParseException if a parsing error occurs.
-     */
     @Override
-    public List<Playlist> getUserPlaylists(String accessToken, String userId) throws IOException, SpotifyWebApiException, ParseException {
+    public JsonNode getUserPlaylists(String accessToken, String userId) throws IOException, InterruptedException {
+        String uri = "https://api.spotify.com/v1/users/" + userId + "/playlists";
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(uri))
+            .header("Authorization", "Bearer " + accessToken)
+            .GET()
+            .build();
 
-        // Set the access token for Spotify API requests
-        spotifyApi.setAccessToken(accessToken);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        // Build the request to get the user's playlists
-        GetListOfUsersPlaylistsRequest getListOfUsersPlaylistsRequest = spotifyApi.getListOfUsersPlaylists(userId)
-                .build();
-
-        // Execute the request and get the response
-        Paging<PlaylistSimplified> playlistSimplifiedPaging = getListOfUsersPlaylistsRequest.execute();
-
-        // Get the simplified playlists from the response
-        PlaylistSimplified[] playlistSimplifiedArray = playlistSimplifiedPaging.getItems();
-
-        // Convert simplified playlists to detailed playlists
-        List<Playlist> detailedPlaylists = new ArrayList<>();
-        for (PlaylistSimplified simplified : playlistSimplifiedArray) {
-            // Build and execute a request to get detailed playlist information (such as playlist description, etc.)
-            GetPlaylistRequest getPlaylistRequest = spotifyApi.getPlaylist(simplified.getId())
-                .build();
-            Playlist detailedPlaylist = getPlaylistRequest.execute();
-            detailedPlaylists.add(detailedPlaylist);
+        if (response.statusCode() != 200) {
+            throw new IOException("Failed to retrieve user playlists | HTTP status: " + response.statusCode() + " | Body: " + response.body());
         }
 
-        return detailedPlaylists;
+        return objectMapper.readTree(response.body());
     }
 
-    /**
-     * Creates a new playlist for the user.
-     *
-     * @param accessToken the access token for Spotify API.
-     * @param userId the user's Spotify ID.
-     * @param name the name of the playlist.
-     * @param description the description of the playlist.
-     * @return the created playlist.
-     * @throws IOException if an I/O error occurs.
-     * @throws SpotifyWebApiException if the Spotify API returns an error.
-     * @throws ParseException if a parsing error occurs.
-     */
     @Override
-    public Playlist createUserPlaylist(String accessToken, String userId, String name, String description) throws IOException, SpotifyWebApiException, ParseException {
-
-        // Set the access token for Spotify API requests
-        spotifyApi.setAccessToken(accessToken);
-
-        // Build the request to create a new playlist
-        CreatePlaylistRequest createPlaylistRequest = spotifyApi.createPlaylist(userId, name)
-            .description(description)
+    public JsonNode createUserPlaylist(String accessToken, String userId, String name, String description) throws IOException, InterruptedException {
+        String uri = "https://api.spotify.com/v1/users/" + userId + "/playlists";
+        String jsonPayload = String.format("{\"name\":\"%s\",\"description\":\"%s\",\"public\":false}", name, description);
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(uri))
+            .header("Authorization", "Bearer " + accessToken)
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
             .build();
 
-        // Execute the request and return the created playlist
-        return createPlaylistRequest.execute();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 201) {
+            throw new IOException("Failed to create user playlist | HTTP status: " + response.statusCode() + " | Body: " + response.body());
+        }
+
+        return objectMapper.readTree(response.body());
     }
 
-    /**
-     * Edits an existing playlist.
-     *
-     * @param accessToken the access token for Spotify API.
-     * @param playlistId the ID of the playlist to be edited.
-     * @param name the new name of the playlist.
-     * @param description the new description of the playlist.
-     * @return the edited playlist.
-     * @throws IOException if an I/O error occurs.
-     * @throws SpotifyWebApiException if the Spotify API returns an error.
-     * @throws ParseException if a parsing error occurs.
-     */
     @Override
-    public Playlist editUserPlaylist(String accessToken, String playlistId, String name, String description) throws IOException, SpotifyWebApiException, ParseException {
-
-        // Set the access token for Spotify API requests
-        spotifyApi.setAccessToken(accessToken);
-
-        // Build the request to edit the playlist details
-        ChangePlaylistsDetailsRequest changePlaylistsDetailsRequest = spotifyApi.changePlaylistsDetails(playlistId)
-            .name(name)
-            .description(description)
+    public JsonNode editUserPlaylist(String accessToken, String playlistId, String name, String description) throws IOException, InterruptedException {
+        String uri = "https://api.spotify.com/v1/playlists/" + playlistId;
+        String jsonPayload = String.format("{\"name\":\"%s\",\"description\":\"%s\",\"public\":false}", name, description);
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(uri))
+            .header("Authorization", "Bearer " + accessToken)
+            .header("Content-Type", "application/json")
+            .PUT(HttpRequest.BodyPublishers.ofString(jsonPayload))
             .build();
 
-        // Execute the request to change playlist details
-        changePlaylistsDetailsRequest.execute();
-        
-        // Return the updated playlist
-        return spotifyApi.getPlaylist(playlistId).build().execute();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new IOException("Failed to edit user playlist | HTTP status: " + response.statusCode() + " | Body: "
+                    + response.body());
+        }
+
+        // Fetch the updated playlist data to return it
+        String fetchUri = "https://api.spotify.com/v1/playlists/" + playlistId;
+        HttpRequest fetchRequest = HttpRequest.newBuilder()
+                .uri(URI.create(fetchUri))
+                .header("Authorization", "Bearer " + accessToken)
+                .GET()
+                .build();
+
+        HttpResponse<String> fetchResponse = httpClient.send(fetchRequest, HttpResponse.BodyHandlers.ofString());
+
+        if (fetchResponse.statusCode() != 200) {
+            throw new IOException("Failed to fetch updated playlist | HTTP status: " + fetchResponse.statusCode()
+                    + " | Body: " + fetchResponse.body());
+        }
+
+        return objectMapper.readTree(fetchResponse.body());
     }
 
-    /**
-     * Deletes a user's playlist.
-     *
-     * @param accessToken the access token for Spotify API.
-     * @param userId the user's Spotify ID.
-     * @param playlistId the ID of the playlist to be deleted.
-     * @throws IOException if an I/O error occurs.
-     * @throws SpotifyWebApiException if the Spotify API returns an error.
-     * @throws ParseException if a parsing error occurs.
-     */
     @Override
-    public void deleteUserPlaylist(String accessToken, String userId, String playlistId) throws IOException, SpotifyWebApiException, ParseException {
-
-        // Set the access token for Spotify API requests
-        spotifyApi.setAccessToken(accessToken);
-
-        // Build the request to unfollow (delete) the playlist
-        UnfollowPlaylistRequest unfollowPlaylistRequest = spotifyApi.unfollowPlaylist(userId, playlistId)
+    public void deleteUserPlaylist(String accessToken, String userId, String playlistId) throws IOException, InterruptedException {
+        String uri = "https://api.spotify.com/v1/users/" + userId + "/playlists/" + playlistId + "/followers";
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(uri))
+            .header("Authorization", "Bearer " + accessToken)
+            .DELETE()
             .build();
 
-        // Execute the request to unfollow the playlist
-        unfollowPlaylistRequest.execute();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new IOException("Failed to delete user playlist | HTTP status: " + response.statusCode() + " | Body: " + response.body());
+        }
     }
 
-    /**
-     * Uploads a custom image for a user's playlist.
-     *
-     * @param accessToken the access token for Spotify API.
-     * @param playlistId the ID of the playlist.
-     * @param base64Image the image data in Base64 format.
-     * @throws IOException if an I/O error occurs.
-     * @throws SpotifyWebApiException if the Spotify API returns an error.
-     * @throws ParseException if a parsing error occurs.
-     */
     @Override
-    public void uploadUserPlaylistImage(String accessToken, String playlistId, String base64Image) throws IOException, SpotifyWebApiException, ParseException {
-
-        // Set the access token for Spotify API requests
-        spotifyApi.setAccessToken(accessToken);
-
-        // Build the request to upload a custom playlist cover image
-        UploadCustomPlaylistCoverImageRequest uploadCustomPlaylistCoverImageRequest = spotifyApi.uploadCustomPlaylistCoverImage(playlistId)
-            .image_data(base64Image)
+    public void uploadUserPlaylistImage(String accessToken, String playlistId, String base64Image) throws IOException, InterruptedException {
+        String uri = "https://api.spotify.com/v1/playlists/" + playlistId + "/images";
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(uri))
+            .header("Authorization", "Bearer " + accessToken)
+            .header("Content-Type", "image/jpeg")
+            .PUT(HttpRequest.BodyPublishers.ofString(base64Image))
             .build();
 
-        // Execute the request to upload the image
-        uploadCustomPlaylistCoverImageRequest.execute();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 202) {
+            throw new IOException("Failed to upload playlist image | HTTP status: " + response.statusCode() + " | Body: " + response.body());
+        }
     }
 }

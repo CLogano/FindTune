@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.findtune.backend.configs.Constants;
+import com.findtune.backend.common.Constants;
 import com.findtune.backend.services.AuthService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,6 +30,8 @@ public class AuthController {
     
     @Autowired
     private AuthService authService;
+    @Autowired
+    private Constants constants;
 
     /**
      * Endpoint to get the Spotify login URI.
@@ -64,11 +66,11 @@ public class AuthController {
             authService.setRefreshToken(authorizationCodeCredentials);
 
             // Redirect to frontend with the access token
-            String redirectUrl = Constants.FRONTEND_API_URL + "/callback?accessToken=" + authorizationCodeCredentials.getAccessToken();
+            String redirectUrl = constants.getFrontendApiUrl() + "/callback?accessToken=" + authorizationCodeCredentials.getAccessToken();
             response.sendRedirect(redirectUrl);
 
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Method: getSpotifyAccessToken | Error: " + e.getMessage());
         }
     }
 }

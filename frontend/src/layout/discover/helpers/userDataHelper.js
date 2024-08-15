@@ -27,7 +27,9 @@ export const getProfile = async (accessToken, onUnauthorized) => {
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
     }
-    onUnauthorized();
+    if (error.message === "Unauthorized") {
+      onUnauthorized();
+    }
   }
 };
 
@@ -54,14 +56,16 @@ export const getPlaylists = async (accessToken, userId, onUnauthorized) => {
     }
 
     const data = await response.json();
-    return data;
+    return data.items;
 
   } catch (error) {
 
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
     }
-    onUnauthorized();
+    if (error.message === "Unauthorized") {
+      onUnauthorized();
+    }
   }
 };
 
@@ -97,6 +101,8 @@ export const createPlaylist = async (accessToken, userId, name, description = ""
     }
 
     const data = await response.json();
+
+    console.log(data);
     return data;
 
   } catch (error) {
@@ -104,7 +110,9 @@ export const createPlaylist = async (accessToken, userId, name, description = ""
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
     }
-    onUnauthorized();
+    if (error.message === "Unauthorized") {
+      onUnauthorized();
+    }
   }
 }
 
@@ -140,6 +148,7 @@ export const editPlaylist = async (accessToken, playlistId, name, description = 
     }
 
     const data = await response.json();
+    console.log(data);
 
     return data;
 
@@ -148,7 +157,9 @@ export const editPlaylist = async (accessToken, playlistId, name, description = 
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
     }
-    onUnauthorized();
+    if (error.message === "Unauthorized") {
+      onUnauthorized();
+    }
   }
 }
 
@@ -186,7 +197,9 @@ export const deletePlaylist = async (accessToken, userId, playlistId, onUnauthor
     if (process.env.NODE_ENV !== "production") {
       console.error(error);
     }
-    onUnauthorized();
+    if (error.message === "Unauthorized") {
+      onUnauthorized();
+    }
 
     return { success: false, error: error.message };
   }

@@ -7,13 +7,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.findtune.backend.services.UserProfileService;
 
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.specification.User;
-
 import java.io.IOException;
-import org.apache.hc.core5.http.ParseException;
 
 /**
  * UserProfileController class that handles user profile-related requests.
@@ -30,24 +27,18 @@ public class UserProfileController {
      * Endpoint to get the current user's profile.
      *
      * @param authorization the access token for Spotify API.
-     * @return the current user's profile.
+     * @return a JsonNode containing the user's profile data.
      * @throws IOException if an I/O error occurs.
-     * @throws SpotifyWebApiException if the Spotify API returns an error.
-     * @throws ParseException if a parsing error occurs.
+     * @throws InterruptedException if the request is interrupted.
      */
     @GetMapping("/profile")
-    public User getCurrentUserProfile(@RequestHeader("Authorization") String authorization) throws IOException, SpotifyWebApiException, ParseException {
-
+    public JsonNode getCurrentUserProfile(@RequestHeader("Authorization") String authorization) throws IOException, InterruptedException {
         try {
-            // Extract access token from Authorization header
             String accessToken = authorization.substring("Bearer ".length());
-
             return userProfileService.getUserProfile(accessToken);
-            
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
+        } catch (IOException | InterruptedException e) {
+            System.out.println("Method: getCurrentUserProfile | Error: " + e.getMessage());
+            throw e;
         }
-        
-        return null;
     }
 }

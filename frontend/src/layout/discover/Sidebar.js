@@ -20,7 +20,7 @@ const Sidebar = (props) => {
     const [barStyle, setBarStyle] = useState({});
 
     // Destructuring props
-    const { playlists, selectedPlaylist, onSelectedPlaylist, onAddPlaylist, onEditPlaylist, onDeletePlaylist } = props;
+    const { accessToken, handleUnauthorized, playlists, selectedPlaylist, onSelectedPlaylist, onAddPlaylist, onEditPlaylist, onDeletePlaylist, genre, onSelectedGenre, markets, onSelectedMarkets, artists, onSelectedArtists, tracks, onSelectedTracks } = props;
 
     // References for the tabs
     const tabRefs = {
@@ -76,9 +76,18 @@ const Sidebar = (props) => {
                         onAddPlaylist={onAddPlaylist}
                         onEditPlaylist={onEditPlaylist}
                         onDeletePlaylist={onDeletePlaylist}
-                    /> : 
-                    <Filters 
-                        
+                    /> :
+                    <Filters
+                        accessToken={accessToken}
+                        handleUnauthorized={handleUnauthorized}
+                        genre={genre}
+                        onSelectedGenre={onSelectedGenre}
+                        artists={artists}
+                        onSelectedArtists={onSelectedArtists}
+                        markets={markets}
+                        onSelectedMarkets={onSelectedMarkets}
+                        tracks={tracks}
+                        onSelectedTracks={onSelectedTracks}
                     />}
             </div>
         </div>

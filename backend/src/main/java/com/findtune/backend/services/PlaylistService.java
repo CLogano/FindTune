@@ -1,25 +1,21 @@
 package com.findtune.backend.services;
 
 import java.io.IOException;
-import java.util.List;
 
-import org.apache.hc.core5.http.ParseException;
-
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * PlaylistService interface that defines methods for handling Spotify playlists.
  */
 public interface PlaylistService {
 
-    List<Playlist> getUserPlaylists(String accessToken, String userId) throws IOException, SpotifyWebApiException, ParseException;
+    JsonNode getUserPlaylists(String accessToken, String userId) throws IOException, InterruptedException;
 
-    Playlist createUserPlaylist(String accessToken, String userId, String name, String description) throws IOException, SpotifyWebApiException, ParseException;
+    JsonNode createUserPlaylist(String accessToken, String userId, String name, String description) throws IOException, InterruptedException;
 
-    Playlist editUserPlaylist(String accessToken, String playlistId, String name, String description) throws IOException, SpotifyWebApiException, ParseException;
+    JsonNode editUserPlaylist(String accessToken, String playlistId, String name, String description) throws IOException, InterruptedException;
 
-    void deleteUserPlaylist(String accessToken, String userId, String playlistId) throws IOException, SpotifyWebApiException, ParseException;
+    void deleteUserPlaylist(String accessToken, String userId, String playlistId) throws IOException, InterruptedException;
 
-    void uploadUserPlaylistImage(String accessToken, String playlistId, String base64Image) throws IOException, SpotifyWebApiException, ParseException;
+    void uploadUserPlaylistImage(String accessToken, String playlistId, String base64Image) throws IOException, InterruptedException;
 }

@@ -23,7 +23,7 @@ public class SecurityConfig {
      * @throws Exception if an error occurs while configuring the security filter chain.
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configure CORS
             .csrf(csrf -> csrf.disable()) // Disable CSRF protection
@@ -40,7 +40,7 @@ public class SecurityConfig {
      * @return the configured UrlBasedCorsConfigurationSource.
      */
     @Bean
-    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    UrlBasedCorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // Allow credentials
